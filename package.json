@@ -1,0 +1,27 @@
+{
+  "name": "lunara-backend",
+  "version": "1.0.0",
+  "description": "Una API REST extremadamente simple y rápida para la aplicación Flutter Lunara - seguimiento de salud femenina con integración de OpenAI.",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "echo 'Tests pending'"
+  },
+  "keywords": ["api", "salud", "femenina", "flutter", "openai", "firebase"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.10.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "firebase-admin": "^13.4.0",
+    "helmet": "^8.1.0",
+    "node-cron": "^4.1.0",
+    "openai": "^5.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
