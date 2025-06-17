@@ -90,6 +90,9 @@ app.use('/api/health-data', require('./routes/health'));
 // AI insights routes
 app.use('/api/ai', require('./routes/ai'));
 
+// User management routes
+app.use('/api/users', require('./routes/users'));
+
 // Analytics routes (to be implemented in next stage)
 // app.use('/api/analytics', require('./routes/analytics'));
 
@@ -107,6 +110,7 @@ app.get('/', (req, res) => {
       health: '/api/health',
       healthData: '/api/health-data',
       aiInsights: '/api/ai',
+      users: '/api/users',
       analytics: '/api/analytics'
     },
     documentation: 'https://github.com/your-repo/lunara-backend',
@@ -130,6 +134,10 @@ app.get('/api', (req, res) => {
       'Fitness tracking',
       'Mental health monitoring',
       'AI-powered insights',
+      'User profile management',
+      'Dashboard analytics',
+      'App settings',
+      'Data export',
       'Firebase authentication'
     ],
     timestamp: new Date().toISOString()

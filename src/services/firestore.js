@@ -331,6 +331,72 @@ class FirestoreService {
       throw new Error(`Error getting user latest data: ${error.message}`);
     }
   }
+
+  // =================== COUNT METHODS ===================
+
+  /**
+   * Get count of user's cycles
+   * @param {string} userId - User ID
+   * @returns {Promise<number>} - Count of cycles
+   */
+  async getCycleCount(userId) {
+    try {
+      const snapshot = await this.db.collection(COLLECTIONS.CYCLES)
+        .where('user_id', '==', userId)
+        .get();
+      return snapshot.size;
+    } catch (error) {
+      throw new Error(`Error getting cycle count: ${error.message}`);
+    }
+  }
+
+  /**
+   * Get count of user's nutrition logs
+   * @param {string} userId - User ID
+   * @returns {Promise<number>} - Count of nutrition logs
+   */
+  async getNutritionLogCount(userId) {
+    try {
+      const snapshot = await this.db.collection(COLLECTIONS.NUTRITION_LOGS)
+        .where('user_id', '==', userId)
+        .get();
+      return snapshot.size;
+    } catch (error) {
+      throw new Error(`Error getting nutrition log count: ${error.message}`);
+    }
+  }
+
+  /**
+   * Get count of user's fitness logs
+   * @param {string} userId - User ID
+   * @returns {Promise<number>} - Count of fitness logs
+   */
+  async getFitnessLogCount(userId) {
+    try {
+      const snapshot = await this.db.collection(COLLECTIONS.FITNESS_LOGS)
+        .where('user_id', '==', userId)
+        .get();
+      return snapshot.size;
+    } catch (error) {
+      throw new Error(`Error getting fitness log count: ${error.message}`);
+    }
+  }
+
+  /**
+   * Get count of user's mental health logs
+   * @param {string} userId - User ID
+   * @returns {Promise<number>} - Count of mental health logs
+   */
+  async getMentalHealthLogCount(userId) {
+    try {
+      const snapshot = await this.db.collection(COLLECTIONS.MENTAL_HEALTH_LOGS)
+        .where('user_id', '==', userId)
+        .get();
+      return snapshot.size;
+    } catch (error) {
+      throw new Error(`Error getting mental health log count: ${error.message}`);
+    }
+  }
 }
 
 // Export singleton instance
