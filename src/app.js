@@ -94,6 +94,9 @@ app.use('/api/ai', require('./routes/ai'));
 // User management routes
 app.use('/api/users', require('./routes/users'));
 
+// Test AI routes (for testing AI connection)
+// app.use('/api/test-ai', require('./routes/test-ai'));
+
 // Analytics routes (to be implemented in next stage)
 // app.use('/api/analytics', require('./routes/analytics'));
 

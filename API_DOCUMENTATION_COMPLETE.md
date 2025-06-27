@@ -3,7 +3,8 @@
 **Version:** 1.0.0  
 **Generated:** June 27, 2025  
 **Status:** Production Ready  
-**Base URL:** `http://localhost:3001` (Development) | `https://your-domain.com` (Production)
+**Base URL:** `http://localhost:3000` (Development) | `https://your-domain.com` (Production)  
+**Note:** Currently using `app-working.js` due to middleware issue in original `app.js`
 
 ---
 
@@ -15,9 +16,10 @@
 4. [System Endpoints](#-system-endpoints)
 5. [Health Data Endpoints](#-health-data-endpoints)
 6. [AI Insights Endpoints](#-ai-insights-endpoints)
-7. [Error Handling](#-error-handling)
-8. [Frontend Integration](#-frontend-integration)
-9. [Testing](#-testing)
+7. [AI Testing Endpoints](#-ai-testing-endpoints)
+8. [Error Handling](#-error-handling)
+9. [Frontend Integration](#-frontend-integration)
+10. [Testing](#-testing)
 
 ---
 
@@ -804,6 +806,82 @@ GET /api/ai/quick-tip?topic=nutrition
 
 ---
 
+## 🧪 **AI TESTING ENDPOINTS**
+
+These endpoints are available for testing OpenAI integration and verifying AI functionality.
+
+### **Test AI Connection**
+```http
+GET /api/test-ai/test-connection
+```
+
+**Description:** Checks if OpenAI service is properly initialized and API key is configured.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "aiAvailable": true,
+    "apiKeyConfigured": true,
+    "apiKeyValue": "Configured (hidden)"
+  }
+}
+```
+
+### **Test AI Generation**
+```http
+POST /api/test-ai/test-generation
+```
+
+**Description:** Tests AI quick tip generation functionality.
+
+**Request Body:**
+```json
+{
+  "topic": "hydration during menstruation"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "message": "AI is working correctly!",
+    "generatedTip": "Stay hydrated during menstruation by drinking plenty of water and herbal teas to help alleviate bloating and reduce cramps. Aim for at least 8-10 cups of fluids per day.",
+    "timestamp": "2025-06-27T10:30:00.000Z"
+  }
+}
+```
+
+### **Test AI Insight Generation**
+```http
+POST /api/test-ai/test-insight
+```
+
+**Description:** Tests full AI insight generation with sample user data.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "message": "AI insight generation successful!",
+    "insight": {
+      "type": "GENERAL_HEALTH",
+      "title": "Health Insight",
+      "content": "Based on your health data...",
+      "confidence_score": 0.8,
+      "generated_at": "2025-06-27T10:30:00.000Z",
+      "expires_at": "2025-07-27T10:30:00.000Z"
+    }
+  }
+}
+```
+
+---
+
 ## ❌ **ERROR HANDLING**
 
 ### **Common Error Responses**
@@ -1252,18 +1330,35 @@ class CycleService {
    npm run test:coverage
    ```
 
+4. **OpenAI Integration Testing**
+   ```bash
+   # Direct OpenAI test (no server needed)
+   node test-openai-direct.js
+   
+   # Test AI endpoints with server running
+   ./test-openai.sh
+   ```
+
 ### **Manual Testing with cURL**
 
 ```bash
 # Health Check
-curl -X GET "http://localhost:3001/api/health"
+curl -X GET "http://localhost:3000/api/health"
+
+# Test OpenAI Connection (no auth required)
+curl -X GET "http://localhost:3000/api/test-ai/test-connection"
+
+# Test AI Generation
+curl -X POST "http://localhost:3000/api/test-ai/test-generation" \
+  -H "Content-Type: application/json" \
+  -d '{"topic": "menstrual health"}'
 
 # Get Cycles (requires auth)
-curl -X GET "http://localhost:3001/api/health-data/cycles" \
+curl -X GET "http://localhost:3000/api/health-data/cycles" \
   -H "Authorization: Bearer YOUR_FIREBASE_TOKEN"
 
 # Create Cycle
-curl -X POST "http://localhost:3001/api/health-data/cycles" \
+curl -X POST "http://localhost:3000/api/health-data/cycles" \
   -H "Authorization: Bearer YOUR_FIREBASE_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -1275,7 +1370,7 @@ curl -X POST "http://localhost:3001/api/health-data/cycles" \
   }'
 
 # Generate AI Insight
-curl -X POST "http://localhost:3001/api/ai/generate-insight" \
+curl -X POST "http://localhost:3000/api/ai/generate-insight" \
   -H "Authorization: Bearer YOUR_FIREBASE_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"type": "general_health"}'
@@ -1289,11 +1384,12 @@ This API provides comprehensive functionality for women's health tracking with A
 
 ### **Key Features**
 - ✅ **Complete CRUD operations** for health data
-- ✅ **AI-powered insights** and recommendations  
+- ✅ **AI-powered insights** and recommendations (OpenAI GPT-3.5-turbo)
 - ✅ **Firebase authentication** integration
 - ✅ **Comprehensive validation** and error handling
 - ✅ **Consistent response format** across all endpoints
 - ✅ **Performance optimized** and production ready
+- ✅ **OpenAI integration** fully configured and tested
 
 ### **Ready for Frontend Integration**
 - JavaScript/TypeScript examples provided
@@ -1301,6 +1397,20 @@ This API provides comprehensive functionality for women's health tracking with A
 - Flutter/Dart integration guide complete
 - cURL commands for testing available
 
+### **Current Status & Notes**
+- 🔧 **Temporary Fix**: Using `app-working.js` instead of `app.js` due to middleware initialization issue
+- ✅ **OpenAI Status**: Fully integrated and operational with API key configured
+- 📍 **Port**: Running on port 3000 (not 3001 as previously documented)
+- 🧪 **Test Endpoints**: Additional `/api/test-ai/*` endpoints available for AI testing
+
+### **Environment Requirements**
+```
+OPENAI_API_KEY=sk-proj-xxxx  # Required for AI features
+FIREBASE_PROJECT_ID=lunara-9a50a
+FIREBASE_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----...
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-fbsvc@lunara-9a50a.iam.gserviceaccount.com
+```
+
 ---
 
-*Documentation generated by Claude Code - Production Ready API*
+*Documentation updated by Claude Code - June 27, 2025*

@@ -4,8 +4,10 @@
   "description": "Una API REST extremadamente simple y rápida para la aplicación Flutter Lunara - seguimiento de salud femenina con integración de OpenAI.",
   "main": "src/app.js",
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "nodemon src/app.js",
+    "start": "node src/app-working.js",
+    "dev": "nodemon src/app-working.js",
+    "start:original": "node src/app.js",
+    "dev:original": "nodemon src/app.js",
     "test": "jest --testTimeout=10000",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
