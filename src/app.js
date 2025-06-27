@@ -23,6 +23,7 @@ const PORT = process.env.PORT || 3000;
 // Security middleware (applied first)
 app.use(helmet);
 app.use(cors);
+app.options('*', cors); // Enable pre-flight for all routes
 app.use(securityHeaders);
 app.use(healthCheckBypass);
 

@@ -12,6 +12,13 @@ const corsConfig = {
     // Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
     
+    // In development, allow any localhost or 127.0.0.1 with any port
+    if (process.env.NODE_ENV === 'development') {
+      if (origin.match(/^http:\/\/localhost:\d+$/) || origin.match(/^http:\/\/127\.0\.0\.1:\d+$/)) {
+        return callback(null, true);
+      }
+    }
+    
     // Allowed origins for different environments
     const allowedOrigins = [
       'http://localhost:3000',     // React development
@@ -22,12 +29,7 @@ const corsConfig = {
       'https://lunara-app.firebaseapp.com' // Firebase Hosting (example)
     ];
 
-    // In development, allow all origins
-    if (process.env.NODE_ENV === 'development') {
-      return callback(null, true);
-    }
-
-    // In production, check allowed origins
+    // Check allowed origins
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -43,7 +45,10 @@ const corsConfig = {
     'Accept',
     'Authorization',
     'Cache-Control',
-    'X-API-Key'
+    'X-API-Key',
+    'X-Platform',
+    'X-Client-Version',
+    'User-Agent'
   ],
   optionsSuccessStatus: 200 // For legacy browser support
 };

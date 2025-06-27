@@ -27,7 +27,7 @@ class FirebaseService {
       // Validate required configuration
       if (!firebaseConfig.projectId || !firebaseConfig.privateKey || !firebaseConfig.clientEmail || 
           firebaseConfig.projectId === 'your-firebase-project-id' || 
-          firebaseConfig.privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
+          !firebaseConfig.privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
         console.warn('⚠️ Firebase configuration not properly set. Running in development mode without Firebase.');
         this.initialized = false;
         return;
