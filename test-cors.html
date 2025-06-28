@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS Test</title>
+</head>
+<body>
+    <h1>CORS Test</h1>
+    <button onclick="testCORS()">Test CORS Request</button>
+    <div id="result"></div>
+
+    <script>
+        async function testCORS() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+
+            try {
+                // First test health endpoint
+                const healthResponse = await fetch('http://localhost:3000/api/health');
+                const healthData = await healthResponse.json();
+                
+                resultDiv.innerHTML += '<br>Health Check: ' + JSON.stringify(healthData);
+
+                // Now test cycles endpoint with a fake token
+                const cyclesResponse = await fetch('http://localhost:3000/api/health-data/cycles', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer test-token'
+                    },
+                    body: JSON.stringify({
+                        start_date: '2025-06-20',
+                        period_duration: 5,
+                        cycle_length: 28
+                    })
+                });
+                
+                const cyclesData = await cyclesResponse.json();
+                resultDiv.innerHTML += '<br><br>Cycles Endpoint: ' + JSON.stringify(cyclesData);
+                
+            } catch (error) {
+                resultDiv.innerHTML += '<br><br>Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

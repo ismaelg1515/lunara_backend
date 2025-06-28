@@ -16,10 +16,11 @@ const { asyncErrorHandler } = require('../middleware/errorHandler');
 
 // Import services
 const firestoreService = require('../services/firestore');
+const firebaseService = require('../services/firebase');
 
 // Import utilities
 const { formatSuccessResponse, formatErrorResponse, calculateCyclePhase } = require('../utils/helpers');
-const { HTTP_STATUS } = require('../utils/constants');
+const { HTTP_STATUS, COLLECTIONS } = require('../utils/constants');
 
 // Apply authentication and sanitization to all routes
 router.use(authenticateUser);
@@ -226,6 +227,81 @@ router.post('/nutrition', validateNutritionData, asyncErrorHandler(async (req, r
   );
 }));
 
+/**
+ * PUT /api/health-data/nutrition/:id
+ * Update nutrition log
+ */
+router.put('/nutrition/:id', validateObjectId('id'), validateNutritionData, asyncErrorHandler(async (req, res) => {
+  if (!firestoreService.db) {
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
+      formatErrorResponse('Database service unavailable', HTTP_STATUS.INTERNAL_SERVER_ERROR)
+    );
+  }
+
+  const { id } = req.params;
+  
+  // Verify the nutrition log belongs to the user
+  const existingLog = await firestoreService.db.collection(COLLECTIONS.NUTRITION_LOGS).doc(id).get();
+  
+  if (!existingLog.exists) {
+    return res.status(HTTP_STATUS.NOT_FOUND).json(
+      formatErrorResponse('Nutrition log not found', HTTP_STATUS.NOT_FOUND)
+    );
+  }
+  
+  if (existingLog.data().user_id !== req.userId) {
+    return res.status(HTTP_STATUS.FORBIDDEN).json(
+      formatErrorResponse('Access denied', HTTP_STATUS.FORBIDDEN)
+    );
+  }
+
+  const updateData = {
+    ...req.body,
+    log_date: new Date(req.body.log_date),
+    updated_at: firebaseService.getServerTimestamp()
+  };
+
+  await firestoreService.db.collection(COLLECTIONS.NUTRITION_LOGS).doc(id).update(updateData);
+  
+  const updatedDoc = await firestoreService.db.collection(COLLECTIONS.NUTRITION_LOGS).doc(id).get();
+  const updatedLog = { id: updatedDoc.id, ...updatedDoc.data() };
+
+  res.json(formatSuccessResponse(updatedLog, 'Nutrition log updated successfully'));
+}));
+
+/**
+ * DELETE /api/health-data/nutrition/:id
+ * Delete nutrition log
+ */
+router.delete('/nutrition/:id', validateObjectId('id'), asyncErrorHandler(async (req, res) => {
+  if (!firestoreService.db) {
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
+      formatErrorResponse('Database service unavailable', HTTP_STATUS.INTERNAL_SERVER_ERROR)
+    );
+  }
+
+  const { id } = req.params;
+  
+  // Verify the nutrition log belongs to the user
+  const existingLog = await firestoreService.db.collection(COLLECTIONS.NUTRITION_LOGS).doc(id).get();
+  
+  if (!existingLog.exists) {
+    return res.status(HTTP_STATUS.NOT_FOUND).json(
+      formatErrorResponse('Nutrition log not found', HTTP_STATUS.NOT_FOUND)
+    );
+  }
+  
+  if (existingLog.data().user_id !== req.userId) {
+    return res.status(HTTP_STATUS.FORBIDDEN).json(
+      formatErrorResponse('Access denied', HTTP_STATUS.FORBIDDEN)
+    );
+  }
+
+  await firestoreService.db.collection(COLLECTIONS.NUTRITION_LOGS).doc(id).delete();
+
+  res.json(formatSuccessResponse(null, 'Nutrition log deleted successfully'));
+}));
+
 // =================== FITNESS LOGS ===================
 
 /**
@@ -274,6 +350,80 @@ router.post('/fitness', validateFitnessData, asyncErrorHandler(async (req, res) 
   );
 }));
 
+/**
+ * PUT /api/health-data/fitness/:id
+ * Update fitness log
+ */
+router.put('/fitness/:id', validateObjectId('id'), validateFitnessData, asyncErrorHandler(async (req, res) => {
+  if (!firestoreService.db) {
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
+      formatErrorResponse('Database service unavailable', HTTP_STATUS.INTERNAL_SERVER_ERROR)
+    );
+  }
+
+  const { id } = req.params;
+  
+  // Verify the fitness log belongs to the user
+  const existingLog = await firestoreService.db.collection(COLLECTIONS.FITNESS_LOGS).doc(id).get();
+  
+  if (!existingLog.exists) {
+    return res.status(HTTP_STATUS.NOT_FOUND).json(
+      formatErrorResponse('Fitness log not found', HTTP_STATUS.NOT_FOUND)
+    );
+  }
+  
+  if (existingLog.data().user_id !== req.userId) {
+    return res.status(HTTP_STATUS.FORBIDDEN).json(
+      formatErrorResponse('Access denied', HTTP_STATUS.FORBIDDEN)
+    );
+  }
+
+  const updateData = {
+    ...req.body,
+    updated_at: firebaseService.getServerTimestamp()
+  };
+
+  await firestoreService.db.collection(COLLECTIONS.FITNESS_LOGS).doc(id).update(updateData);
+  
+  const updatedDoc = await firestoreService.db.collection(COLLECTIONS.FITNESS_LOGS).doc(id).get();
+  const updatedLog = { id: updatedDoc.id, ...updatedDoc.data() };
+
+  res.json(formatSuccessResponse(updatedLog, 'Fitness log updated successfully'));
+}));
+
+/**
+ * DELETE /api/health-data/fitness/:id
+ * Delete fitness log
+ */
+router.delete('/fitness/:id', validateObjectId('id'), asyncErrorHandler(async (req, res) => {
+  if (!firestoreService.db) {
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
+      formatErrorResponse('Database service unavailable', HTTP_STATUS.INTERNAL_SERVER_ERROR)
+    );
+  }
+
+  const { id } = req.params;
+  
+  // Verify the fitness log belongs to the user
+  const existingLog = await firestoreService.db.collection(COLLECTIONS.FITNESS_LOGS).doc(id).get();
+  
+  if (!existingLog.exists) {
+    return res.status(HTTP_STATUS.NOT_FOUND).json(
+      formatErrorResponse('Fitness log not found', HTTP_STATUS.NOT_FOUND)
+    );
+  }
+  
+  if (existingLog.data().user_id !== req.userId) {
+    return res.status(HTTP_STATUS.FORBIDDEN).json(
+      formatErrorResponse('Access denied', HTTP_STATUS.FORBIDDEN)
+    );
+  }
+
+  await firestoreService.db.collection(COLLECTIONS.FITNESS_LOGS).doc(id).delete();
+
+  res.json(formatSuccessResponse(null, 'Fitness log deleted successfully'));
+}));
+
 // =================== MENTAL HEALTH LOGS ===================
 
 /**
@@ -320,6 +470,80 @@ router.post('/mental-health', validateMentalHealthData, asyncErrorHandler(async 
   res.status(HTTP_STATUS.CREATED).json(
     formatSuccessResponse(mentalHealthLog, 'Mental health log created successfully')
   );
+}));
+
+/**
+ * PUT /api/health-data/mental-health/:id
+ * Update mental health log
+ */
+router.put('/mental-health/:id', validateObjectId('id'), validateMentalHealthData, asyncErrorHandler(async (req, res) => {
+  if (!firestoreService.db) {
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
+      formatErrorResponse('Database service unavailable', HTTP_STATUS.INTERNAL_SERVER_ERROR)
+    );
+  }
+
+  const { id } = req.params;
+  
+  // Verify the mental health log belongs to the user
+  const existingLog = await firestoreService.db.collection(COLLECTIONS.MENTAL_HEALTH_LOGS).doc(id).get();
+  
+  if (!existingLog.exists) {
+    return res.status(HTTP_STATUS.NOT_FOUND).json(
+      formatErrorResponse('Mental health log not found', HTTP_STATUS.NOT_FOUND)
+    );
+  }
+  
+  if (existingLog.data().user_id !== req.userId) {
+    return res.status(HTTP_STATUS.FORBIDDEN).json(
+      formatErrorResponse('Access denied', HTTP_STATUS.FORBIDDEN)
+    );
+  }
+
+  const updateData = {
+    ...req.body,
+    updated_at: firebaseService.getServerTimestamp()
+  };
+
+  await firestoreService.db.collection(COLLECTIONS.MENTAL_HEALTH_LOGS).doc(id).update(updateData);
+  
+  const updatedDoc = await firestoreService.db.collection(COLLECTIONS.MENTAL_HEALTH_LOGS).doc(id).get();
+  const updatedLog = { id: updatedDoc.id, ...updatedDoc.data() };
+
+  res.json(formatSuccessResponse(updatedLog, 'Mental health log updated successfully'));
+}));
+
+/**
+ * DELETE /api/health-data/mental-health/:id
+ * Delete mental health log
+ */
+router.delete('/mental-health/:id', validateObjectId('id'), asyncErrorHandler(async (req, res) => {
+  if (!firestoreService.db) {
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
+      formatErrorResponse('Database service unavailable', HTTP_STATUS.INTERNAL_SERVER_ERROR)
+    );
+  }
+
+  const { id } = req.params;
+  
+  // Verify the mental health log belongs to the user
+  const existingLog = await firestoreService.db.collection(COLLECTIONS.MENTAL_HEALTH_LOGS).doc(id).get();
+  
+  if (!existingLog.exists) {
+    return res.status(HTTP_STATUS.NOT_FOUND).json(
+      formatErrorResponse('Mental health log not found', HTTP_STATUS.NOT_FOUND)
+    );
+  }
+  
+  if (existingLog.data().user_id !== req.userId) {
+    return res.status(HTTP_STATUS.FORBIDDEN).json(
+      formatErrorResponse('Access denied', HTTP_STATUS.FORBIDDEN)
+    );
+  }
+
+  await firestoreService.db.collection(COLLECTIONS.MENTAL_HEALTH_LOGS).doc(id).delete();
+
+  res.json(formatSuccessResponse(null, 'Mental health log deleted successfully'));
 }));
 
 // =================== AGGREGATE DATA ===================

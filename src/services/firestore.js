@@ -146,20 +146,31 @@ class FirestoreService {
       let query = this.db.collection(COLLECTIONS.NUTRITION_LOGS)
         .where('user_id', '==', userId);
       
-      if (date) {
-        const startDate = new Date(date);
-        const endDate = new Date(date);
-        endDate.setDate(endDate.getDate() + 1);
-        
-        query = query.where('log_date', '>=', startDate)
-                    .where('log_date', '<', endDate);
-      }
+      // Temporarily disable date filtering to debug
+      // TODO: Fix date filtering with proper timezone handling
       
       const snapshot = await query.orderBy('created_at', 'desc')
                                  .limit(limit)
                                  .get();
       
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      let results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      // If date filter provided, filter results in memory
+      if (date) {
+        const filterDate = new Date(date);
+        const filterDateStr = filterDate.toISOString().split('T')[0];
+        
+        results = results.filter(log => {
+          if (log.log_date) {
+            const logDate = new Date(log.log_date._seconds ? log.log_date._seconds * 1000 : log.log_date);
+            const logDateStr = logDate.toISOString().split('T')[0];
+            return logDateStr === filterDateStr;
+          }
+          return false;
+        });
+      }
+      
+      return results;
     } catch (error) {
       throw new Error(`Error getting nutrition logs: ${error.message}`);
     }
