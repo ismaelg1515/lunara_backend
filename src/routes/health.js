@@ -41,7 +41,7 @@ router.get('/cycles', validateQueryParams, asyncErrorHandler(async (req, res) =>
     );
   }
 
-  const cycles = await firestoreService.getCycles(req.userId, limit);
+  const cycles = await firestoreService.getCycles(req.userId, parseInt(limit, 10));
   
   // Add cycle phase calculation to each cycle
   const cyclesWithPhase = cycles.map(cycle => ({
@@ -192,7 +192,7 @@ router.get('/nutrition', validateQueryParams, asyncErrorHandler(async (req, res)
     );
   }
 
-  const nutritionLogs = await firestoreService.getNutritionLogs(req.userId, date, limit);
+  const nutritionLogs = await firestoreService.getNutritionLogs(req.userId, date, parseInt(limit, 10));
 
   res.json(formatSuccessResponse({
     nutrition_logs: nutritionLogs,
@@ -241,7 +241,7 @@ router.get('/fitness', validateQueryParams, asyncErrorHandler(async (req, res) =
     );
   }
 
-  const fitnessLogs = await firestoreService.getFitnessLogs(req.userId, limit);
+  const fitnessLogs = await firestoreService.getFitnessLogs(req.userId, parseInt(limit, 10));
 
   res.json(formatSuccessResponse({
     fitness_logs: fitnessLogs,
@@ -289,7 +289,7 @@ router.get('/mental-health', validateQueryParams, asyncErrorHandler(async (req, 
     );
   }
 
-  const mentalHealthLogs = await firestoreService.getMentalHealthLogs(req.userId, limit);
+  const mentalHealthLogs = await firestoreService.getMentalHealthLogs(req.userId, parseInt(limit, 10));
 
   res.json(formatSuccessResponse({
     mental_health_logs: mentalHealthLogs,
